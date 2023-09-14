@@ -40,7 +40,7 @@ func (u *ClientDBStore) GetClientDetailsById(id string) (ClientDetail, error) {
 }
 
 func (u *ClientDBStore) GetClientDetailsByEmail(emailAddress string) (ClientDetail, error) {
-	query := "SELECT * FROM client_details WHERE emailAddress=?"
+	query := "SELECT * FROM client_details WHERE emailAddress = ?"
 
 	res := ClientDetail{}
 

@@ -12,6 +12,7 @@ func ApiRoutes(app *fiber.App, cache *cache.Cache, db *sql.DB) {
 	requestStore := data.NewRequestStore(db)
 	clientApi := ClientApi(cache, clientStore)
 	requestApi := NewRequestApi(clientStore, requestStore)
+	app.Get("/client", clientApi.GetClientByEmail)
 	app.Post("/client", clientApi.CreateClient)
 	app.Get("client/:id", clientApi.GetClientById)
 	app.Post("client/:id/money-requests", requestApi.CreateMoneyRequest)

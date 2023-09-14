@@ -3,6 +3,7 @@ package api
 import (
 	"Api_Mock/pkg/model"
 	response2 "Api_Mock/pkg/protocol/http/response"
+	"Api_Mock/pkg/utils"
 	"Api_Mock/services/mockservice/data"
 	"database/sql"
 	"fmt"
@@ -19,6 +20,7 @@ type Service struct {
 type Api interface {
 	CreateClient(ctx *fiber.Ctx) error
 	GetClientById(ctx *fiber.Ctx) error
+	GetClientByEmail(ctx *fiber.Ctx) error
 }
 
 func ClientApi(cache *cache.Cache, userDetailsStore data.ClientStore) Api {
@@ -32,6 +34,7 @@ func (m *Service) CreateClient(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&payload); err != nil {
 		return ctx.Status(400).SendString("Bad Request")
 	}
+	payload.EmailAddress = utils.Normalize(payload.EmailAddress)
 	_, err := m.clientStore.GetClientDetailsByEmail(payload.EmailAddress)
 	if err == nil {
 		errorResponse := response2.ErrorResponse{
@@ -74,16 +77,40 @@ func (m *Service) CreateClient(ctx *fiber.Ctx) error {
 }
 
 func (m *Service) GetClientById(ctx *fiber.Ctx) error {
-
+	ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
 	clientId := ctx.Params("id")
 	clientDetails, err := m.clientStore.GetClientDetailsById(clientId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			errorResponse := response2.ErrorResponse{
-				ErrorCode: fmt.Sprintf(`db error: no record found for client id %s`, clientId),
-				Message:   err.Error(),
+				ErrorCode: "Not Found",
+				Message:   fmt.Sprintf(`db error: no record found for client id %s`, clientId),
 			}
-			return ctx.Status(fiber.StatusInternalServerError).JSON(errorResponse)
+			return ctx.Status(fiber.StatusNotFound).JSON(errorResponse)
+		}
+		errorResponse := response2.ErrorResponse{
+			ErrorCode: "db error",
+			Message:   err.Error(),
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(errorResponse)
+	}
+
+	return ctx.Status(200).JSON(clientDetails)
+}
+
+func (m *Service) GetClientByEmail(ctx *fiber.Ctx) error {
+	ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
+	clientEmail := ctx.Get("client-header")
+	clientEmail = utils.Normalize(clientEmail)
+
+	clientDetails, err := m.clientStore.GetClientDetailsByEmail(clientEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			errorResponse := response2.ErrorResponse{
+				ErrorCode: "Not Found",
+				Message:   fmt.Sprintf(`db error: no record found for client email %s`, clientEmail),
+			}
+			return ctx.Status(fiber.StatusNotFound).JSON(errorResponse)
 		}
 		errorResponse := response2.ErrorResponse{
 			ErrorCode: "db error",
