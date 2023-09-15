@@ -30,6 +30,6 @@ func main() {
 
 	fmt.Println("port\t", os.Getenv("APP_PORT"))
 
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(":80"))
 
 }
