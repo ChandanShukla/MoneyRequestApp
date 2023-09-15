@@ -7,8 +7,6 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-const base_url = "api/v1"
-
 func ApiRoutes(app *fiber.App, cache *cache.Cache, db *sql.DB) {
 	clientStore := data.NewClientDetailsStore(db)
 	requestStore := data.NewRequestStore(db)
