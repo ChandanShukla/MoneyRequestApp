@@ -1,0 +1,334 @@
+openapi: 3.0.3
+info:
+  title: Request Money
+  version: v0.0.1
+  description: |
+    Welcome to the RBC API challenge! We want you to build an innovative solution leveraging our Request Money feature. We have built this sample API off of a real API in RBC to make it easy for you to leverage! 
+    
+    This Request Money API can be used for a client to request money from another client. In order to submit or accept/decline a money request, both the Requester (person submitting the request - recieving the money) and the Requestee (person that the money is request from - sending the money) must be clients. Clients can be created and added into our system using the `POST /client` endpoint. 
+  
+    To create a money request, the Requester must create a new money request with the `POST /money-request` endpoint with the required request body. Once it's created, the Requestee can use the `PUT /money-request` to accept or decline the request. 
+    
+externalDocs:
+  description: Check out Careers at RBC
+  url: https://jobs.rbc.com/ca/en
+  
+servers:
+  - url: 'http://moneyrequestapp.canadacentral.cloudapp.azure.com:8080/'
+    description: Sample API server
+
+security:
+  - client-header: []
+
+tags:
+  - name: Clients
+    description: Used to manage clients on the Money Request system, can be used to create and fetch clients. Name and email is required
+  - name: Money Request
+    description: Used to create and manage Money Requests. Requesters can request money with a specified amount and message and the Requestee can decide to approve or decline the request. 
+
+paths:
+  '/client':
+    get:
+      tags:
+        - Clients
+      description: |
+        Search for a specific client using an email address
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+          required: true
+          description: The email address of the client
+      responses:
+        '200':
+          description: |
+            Successfully fetched request details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: |
+            The client with this email address can not be found. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      tags:
+        - Clients
+      description: For creating a new client. The client will be assigned a new ID once created
+      requestBody:
+        $ref: '#/components/requestBodies/newClientBody'
+      responses:
+        '200':
+          description: The request is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '400':
+          description: The request is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+          
+  '/client/{id}':
+    parameters:
+      - name: id
+        in: path
+        description: 'Client id'
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Clients
+      description: |
+        retrieves the client details
+      responses:
+        '200':
+          description: |
+            successfully fetched request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: |
+            client with this ID does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  '/money-request':
+    get:
+      tags:
+        - Money Request
+      description: |
+        returns a list of money requested for a specific client
+      responses:
+        '200':
+          description: |
+            A list of money requests that is assigned to a client
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/MoneyRequestResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      tags:
+        - Money Request
+      description: |
+        Creates a new money request for a specific client
+      requestBody:
+        $ref: '#/components/requestBodies/newMoneyRequestBody'
+      responses:
+        '201':
+          description: The request is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoneyRequestResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  '/money-request/{id}':
+    parameters:
+      - name: id
+        in: path
+        description: 'Money request ID'
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Money Request
+      description: |
+        retrieves money request details from Money request ID
+      responses:
+        '200':
+          description: |
+            successfully fetched request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoneyRequestResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    put:
+      tags:
+        - Money Request
+      description: to decline a money request
+      requestBody:
+        $ref: '#/components/requestBodies/updateMoneyRequestBody'
+      responses:
+        '200':
+          description: The request is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoneyRequestResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+components:
+  requestBodies:
+    newClientBody:
+      description: |
+        Request body consisting of message to the requester
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Client'
+
+    newMoneyRequestBody:
+      description: |
+        Request body consisting of message to the requester
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MoneyRequest'
+            
+    updateMoneyRequestBody:
+      description: |
+        Request body consisting of message to the requester
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateMoneyRequest'
+            
+  responses:
+    ErrorResponse:
+      description: |
+        response body for error case
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorResponseBody'
+
+  securitySchemes:
+    client-header:
+      type: apiKey
+      in: header
+      name: x-signed-on-client
+
+  schemas:
+    Client:
+      type: object
+      description: 'A client of the money request system'
+      required:
+        - name
+        - emailAddress
+      properties:
+        name:
+          type: string
+          description: The name of the requester
+        emailAddress:
+          type: string
+          description: Amount requested by the user.
+    ClientResponse:
+      allOf:     # Combines the BasicErrorModel and the inline model
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+        - $ref: '#/components/schemas/Client'
+          
+    MoneyRequest:
+      type: object
+      description: 'The money request details'
+      required:
+        - id
+        - requesterName
+        - requestedAmount
+        - requestedDueDate
+        - expirationDate
+      properties:
+        expirationDate:
+          type: string
+          description: Request Payment Date.
+        amount:
+          type: string
+          description: Amount requested by the user.
+        requesteeId:
+          type: string
+          description: The name of the requestee
+        invoiceNumber:
+          type: string
+          description: Invoice number.
+        message:
+          type: string
+          description: Requestor message
+
+    MoneyRequestResponse:
+      allOf:     # Combines the BasicErrorModel and the inline model
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: |
+                Unique reference number for this request.
+            requestedDate:
+              type: string
+              description: Request Payment Date.
+            requesterId:
+              type: string
+              description: The name of the requester
+            requesterName:
+              type: string
+              description: The name of the requester
+            requesteeName:
+              type: string
+              description: The name of the requestee
+            requestStatus:
+              type: string
+              description: The name of the requestee
+              enum: 
+                - PENDING
+                - ACCEPTED
+                - DECLINED
+        - $ref: '#/components/schemas/MoneyRequest'
+
+    UpdateMoneyRequest:
+      type: object
+      description: 'The provided details to decline the money request'
+      properties:
+        action:
+          type: string
+          enum:
+            - ACCEPT
+            - DECLINE
+          description: 'Action to update a request: decline'
+
+    GenericErrorResponseBody:
+      required:
+        - errorCode
+      type: object
+      description: the generic response encomparing the reason for faliure
+      properties:
+        errorCode:
+          type: string
+          description: unique error code representing reason for faliure
+        message:
+          type: string
+          description: descriptive error message
