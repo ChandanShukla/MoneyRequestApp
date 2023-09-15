@@ -7,16 +7,20 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+const base_url = "api/v1"
+
 func ApiRoutes(app *fiber.App, cache *cache.Cache, db *sql.DB) {
 	clientStore := data.NewClientDetailsStore(db)
 	requestStore := data.NewRequestStore(db)
 	clientApi := ClientApi(cache, clientStore)
 	requestApi := NewRequestApi(clientStore, requestStore)
-	app.Get("/client", clientApi.GetClientByEmail)
-	app.Post("/client", clientApi.CreateClient)
-	app.Get("client/:id", clientApi.GetClientById)
-	app.Post("client/:id/money-requests", requestApi.CreateMoneyRequest)
-	app.Get("client/:id/money-requests", requestApi.GetMoneyRequest)
-	app.Get("/money-request/:id", requestApi.GetMoneyRequestById)
-	app.Put("/money-request/:id", requestApi.UpdateMoneyRequestById)
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+	v1.Get("/client", clientApi.GetClientByEmail)
+	v1.Post("/client", clientApi.CreateClient)
+	v1.Get("client/:id", clientApi.GetClientById)
+	v1.Post("/money-request", requestApi.CreateMoneyRequest)
+	v1.Get("/money-request", requestApi.GetMoneyRequest)
+	v1.Get("/money-request/:id", requestApi.GetMoneyRequestById)
+	v1.Put("/money-request/:id", requestApi.UpdateMoneyRequestById)
 }

@@ -100,7 +100,7 @@ func (m *Service) GetClientById(ctx *fiber.Ctx) error {
 
 func (m *Service) GetClientByEmail(ctx *fiber.Ctx) error {
 	ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-	clientEmail := ctx.Get("client-header")
+	clientEmail := ctx.Get("x-signed-on-client")
 	clientEmail = utils.Normalize(clientEmail)
 
 	clientDetails, err := m.clientStore.GetClientDetailsByEmail(clientEmail)

@@ -31,7 +31,9 @@ func NewRequestApi(clientStore data.ClientStore, requestStore data.RequestStore)
 }
 
 func (m *MoneyRequest) CreateMoneyRequest(ctx *fiber.Ctx) error {
-	requesterId := ctx.Params("id")
+	ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
+	requesterId := ctx.Get("x-signed-on-client")
+
 	payload := model.MoneyRequest{}
 	if err := ctx.BodyParser(&payload); err != nil {
 		errorResponse := response.ErrorResponse{
@@ -67,10 +69,6 @@ func (m *MoneyRequest) CreateMoneyRequest(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(errorResponse)
 	}
 
-	fmt.Println("=========Create Request===========")
-	fmt.Println("Request ID \t", requesterId)
-	fmt.Println("=========Create Request===========")
-
 	moneyRequest := &data.Request{
 		ID:             uuid.New().String(),
 		RequestedDate:  time.Now().String(),
@@ -99,8 +97,8 @@ func (m *MoneyRequest) CreateMoneyRequest(ctx *fiber.Ctx) error {
 }
 
 func (m *MoneyRequest) GetMoneyRequest(ctx *fiber.Ctx) error {
-	clientId := ctx.Params("id")
-
+	ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
+	clientId := ctx.Get("x-signed-on-client")
 	moneyRequests, err := m.requestStore.GetRequestsByClientId(clientId)
 	if err != nil {
 		errorResponse := response.ErrorResponse{
@@ -122,6 +120,7 @@ func (m *MoneyRequest) GetMoneyRequest(ctx *fiber.Ctx) error {
 }
 
 func (m *MoneyRequest) GetMoneyRequestById(ctx *fiber.Ctx) error {
+	ctx.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
 	requestId := ctx.Params("id")
 	moneyRequest, err := m.requestStore.GetMoneyRequestById(requestId)
 	if err != nil {
