@@ -1,0 +1,179 @@
+{
+	"info": {
+		"_postman_id": "f3ba9bb3-bcc9-4497-8a7e-bcc32221d2de",
+		"name": "Payment_Request",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18172470"
+	},
+	"item": [
+		{
+			"name": "Create Client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Name\": \"Mayyank\",\n    \"EmailAddress\": \"Mayyank.shukla@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/client",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Client",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/client/828d5fb7-4a84-4a4a-be9c-c3037b281847",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"client",
+						"828d5fb7-4a84-4a4a-be9c-c3037b281847"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Requests",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/client/04984381-deaf-4537-a4a8-c477fa02ff06/money-requests",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"client",
+						"04984381-deaf-4537-a4a8-c477fa02ff06",
+						"money-requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-signed-on-client",
+						"value": "d205a41a-535a-4b35-a64f-4d93e74a2f52",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": \"100000\",\n    \"requesteeId\" : \"c34c0e85-ae18-4db4-8577-634f3f6d5c97\",\n    \"message\": \"Money for party\",\n    \"invoiceNumber\": \"sdhs983t4lknlksf\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/money-request",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"money-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Requests By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/money-request/3071558a-9c73-470c-8d5f-a495e027c8be",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"money-request",
+						"3071558a-9c73-470c-8d5f-a495e027c8be"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Request Status",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"messageToRequester\": \"Done\",\n    \"Action\": \"accept\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/money-request/bda213ad-36c9-4388-a800-4986003d482f",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"money-request",
+						"bda213ad-36c9-4388-a800-4986003d482f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Client By Email",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "client-header",
+						"value": "chandan.shukla@gmail.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/client?email=Mayyank.shukla@gmail.com",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"client"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "Mayyank.shukla@gmail.com"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
