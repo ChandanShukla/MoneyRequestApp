@@ -4,7 +4,6 @@ import (
 	"Api_Mock/services/mockservice/data"
 	"database/sql"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -13,7 +12,6 @@ func ApiRoutes(app *fiber.App, cache *cache.Cache, db *sql.DB) {
 	requestStore := data.NewRequestStore(db)
 	clientApi := ClientApi(cache, clientStore)
 	requestApi := NewRequestApi(clientStore, requestStore)
-	app.Use(cors.New())
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 	v1.Get("/client", clientApi.GetClientByEmail)
